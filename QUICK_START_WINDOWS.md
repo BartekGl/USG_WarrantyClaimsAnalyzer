@@ -1,42 +1,53 @@
 # Quick Start Guide - Windows
 
-Complete setup guide for Windows users to get the USG Failure Prediction system running in minutes.
+Complete setup guide for Windows users to get the USG Failure Prediction system running locally.
 
 ## Prerequisites
 
-- ✅ Python 3.10 or higher installed
-- ✅ pip package manager
-- ✅ Git (optional, for cloning)
-- ✅ 4GB+ RAM available
-- ✅ Node.js 18+ (for frontend dashboard - optional)
+- Python 3.10 or higher installed ([download](https://www.python.org/downloads/))
+- pip package manager (included with Python)
+- Git (optional, for cloning)
+- 4GB+ RAM available
+- Node.js 18+ (optional, only for the React frontend dashboard)
 
-## Step-by-Step Setup
-
-### 1. Download/Clone the Project
+## Step 1 - Download or Clone the Project
 
 ```powershell
-# If you have git:
-git clone https://github.com/BartekGl/ALK_DuzyProjekt.git
-cd ALK_DuzyProjekt
+# Option A: Clone with git
+git clone https://github.com/BartekGl/USG_WarrantyClaimsAnalyzer.git
+cd USG_WarrantyClaimsAnalyzer
 
-# Or download ZIP from GitHub and extract
+# Option B: Download ZIP from GitHub and extract, then cd into the folder
 ```
 
-### 2. Create Virtual Environment
+## Step 2 - Create and Activate the Virtual Environment
+
+A Python virtual environment (`.venv`) is **required** to run this project. It isolates the project's dependencies from your system Python installation and prevents version conflicts with other projects.
 
 ```powershell
-# Create virtual environment
-python -m venv venv
-
-# Activate it
-venv\Scripts\activate
-
-# Your prompt should now show (venv)
+# Create the virtual environment (run once)
+python -m venv .venv
 ```
 
-**Important**: Always activate the virtual environment before running any scripts!
+After creating the virtual environment, **activate it**:
 
-### 3. Install Dependencies
+```powershell
+.venv\Scripts\activate
+```
+
+Your terminal prompt should now show a `(.venv)` prefix, confirming the environment is active:
+
+```
+(.venv) PS C:\Users\you\USG_WarrantyClaimsAnalyzer>
+```
+
+> **Important**: You must activate the virtual environment **every time** you open a new terminal window before running any project commands. If you see `ModuleNotFoundError` or similar import errors, the most likely cause is a missing `.venv` activation.
+
+### Why `.venv` and not `venv`?
+
+The `.venv` naming convention (with the leading dot) keeps the environment directory hidden on Unix systems and is the Python community standard. Both names work on Windows, but `.venv` is recommended for cross-platform consistency.
+
+## Step 3 - Install Dependencies
 
 ```powershell
 # Upgrade pip first (recommended)
@@ -46,16 +57,28 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-This will take 2-3 minutes and install ~50 packages including:
+This installs ~50 packages including:
 - XGBoost, LightGBM, scikit-learn (ML models)
-- SHAP (explainability)
-- FastAPI (API server)
+- SHAP (model explainability)
+- FastAPI, uvicorn (API server)
 - Optuna (hyperparameter tuning)
 - Pandas, NumPy (data processing)
 
-### 4. Prepare Your Data
+### Verify the installation
 
-Place your dataset in the correct location:
+```powershell
+python -c "import xgboost; import shap; import fastapi; print('All imports OK')"
+```
+
+You can also run the verification script:
+
+```powershell
+scripts\verify.bat
+```
+
+## Step 4 - Prepare Your Data
+
+Place your dataset CSV in the `data\raw\` directory:
 
 ```powershell
 # Create the directory if it doesn't exist
@@ -65,87 +88,91 @@ mkdir data\raw -Force
 copy "C:\path\to\your\USG_Data_cleared.csv" data\raw\
 ```
 
-**Required**: Your CSV file should have these columns:
-- `Warranty_Claim` (target: Yes/No)
-- `Batch_ID`
-- `Assembly_Temp_C`
-- `Humidity_Percent`
-- `Solder_Temp_C`
-- `Solder_Time_s`
-- `Torque_Nm`
-- `Gap_mm`
-- `Region`
-- ... and other production parameters
+Verify the file is in place:
 
-### 5. Train the Model
+```powershell
+dir data\raw\USG_Data_cleared.csv
+```
 
-Simply run the training batch script:
+**Required columns** in the CSV:
+- `Warranty_Claim` (target column: Yes/No)
+- Manufacturing parameters: `Assembly_Temp_C`, `Humidity_Percent`, `Solder_Temp_C`, `Solder_Time_s`, `Torque_Nm`, `Gap_mm`, `Batch_ID`, `Region`, and other production columns
+
+## Step 5 - Train the Model
+
+You have two training options:
+
+### Option A: Simple training (recommended for getting started)
+
+Uses the unified `ml_core.py` pipeline with optimized default hyperparameters. Fast and requires no tuning.
+
+```powershell
+python ml_core.py
+```
+
+Or use the batch script:
+
+```powershell
+scripts\train_simple.bat
+```
+
+This takes approximately 2-3 minutes and produces:
+- `models\model.pkl` - Trained XGBoost model
+- `models\preprocessor.pkl` - Feature engineering pipeline
+- `models\feature_names.json` - Feature metadata
+
+### Option B: Full training with hyperparameter optimization
+
+Uses Optuna for hyperparameter search and trains an ensemble (XGBoost + Random Forest + LightGBM). Higher performance but slower.
 
 ```powershell
 scripts\train.bat
 ```
 
-**What this does:**
-1. ✅ Creates necessary directories (`data/processed`, `models`, `reports`)
-2. ✅ Loads and preprocesses your data (feature engineering)
-3. ✅ Runs Optuna hyperparameter optimization (50 trials)
-4. ✅ Trains XGBoost ensemble model (XGB + RF + LightGBM)
-5. ✅ Evaluates performance with cross-validation
-6. ✅ Saves model artifacts to `models/` directory
+This takes 5-10 minutes and additionally produces:
+- `data\processed\X_processed.csv` - Processed features
+- `data\processed\y_target.csv` - Target labels
+- `reports\metrics\evaluation_results.json` - Performance metrics
+- `reports\metrics\best_hyperparameters.json` - Optimal parameters
 
-**Expected time**: 5-10 minutes (depending on your CPU)
+See `SIMPLE_TRAINING_GUIDE.md` for a detailed comparison of both approaches.
 
-**Output files:**
-- `models/model.pkl` - Trained model
-- `models/preprocessor.pkl` - Feature engineering pipeline
-- `models/feature_names.json` - Feature metadata
-- `data/processed/X_processed.csv` - Processed features
-- `data/processed/y_target.csv` - Target labels
-- `reports/metrics/evaluation_results.json` - Performance metrics
-- `reports/metrics/best_hyperparameters.json` - Optimal parameters
+## Step 6 - Generate SHAP Explanations (Optional)
 
-### 6. Generate SHAP Explanations
-
-Run the SHAP analysis script:
+SHAP analysis generates feature importance visualizations that explain model predictions:
 
 ```powershell
 scripts\shap.bat
 ```
 
-**What this does:**
-1. ✅ Loads trained model
-2. ✅ Computes SHAP values for test set
-3. ✅ Generates visualizations:
-   - Summary plot (beeswarm)
-   - Bar plot (feature importance)
-   - Waterfall plots (example predictions)
-4. ✅ Saves SHAP explainer for API use
+Output (saved to `reports\visualizations\`):
+- `shap_summary_plot.png` - Beeswarm summary
+- `shap_bar_plot.png` - Feature importance ranking
+- `shap_waterfall_failure.png` - Example failure explanation
+- `shap_waterfall_no_failure.png` - Example non-failure explanation
+- `models\shap_explainer.pkl` - Saved explainer for API use
 
-**Expected time**: 2-3 minutes
+## Step 7 - Start the API Server
 
-**Output files:**
-- `reports/visualizations/shap_summary_plot.png`
-- `reports/visualizations/shap_bar_plot.png`
-- `reports/visualizations/shap_waterfall_failure.png`
-- `reports/visualizations/shap_waterfall_no_failure.png`
-- `models/shap_explainer.pkl`
-
-### 7. Start the API Server
+With the model trained, start the FastAPI prediction server:
 
 ```powershell
 scripts\start_api.bat
 ```
 
+Or run uvicorn directly:
+
+```powershell
+uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
+```
+
 The API will be available at:
-- **Interactive docs**: http://localhost:8000/docs
+- **Interactive docs (Swagger)**: http://localhost:8000/docs
 - **Health check**: http://localhost:8000/health
 - **API base**: http://localhost:8000
 
-**Test the API:**
+Test it by opening http://localhost:8000/health in your browser. You should see:
 
-Open your browser and go to http://localhost:8000/docs
-
-Try the `/health` endpoint - you should see:
 ```json
 {
   "status": "healthy",
@@ -155,51 +182,93 @@ Try the `/health` endpoint - you should see:
 }
 ```
 
-### 8. (Optional) Run the Dashboard
+> **Note**: Keep this terminal window open while the API is running. Use a new terminal for the steps below.
 
-Open a **new PowerShell window**:
+## Step 8 - Start the Streamlit Dashboard (Optional)
+
+The Streamlit dashboard provides an analytics interface for exploring model performance and SHAP explanations.
+
+Open a **new PowerShell window**, then:
 
 ```powershell
-cd frontend
+cd USG_WarrantyClaimsAnalyzer
+.venv\Scripts\activate
 
-# Install dependencies (first time only)
+# Install additional dashboard dependencies (first time only)
+pip install -r dashboard_requirements.txt
+
+# Start the dashboard
+scripts\dashboard.bat
+```
+
+Or run directly:
+
+```powershell
+streamlit run app.py
+```
+
+The dashboard opens at: http://localhost:8501
+
+## Step 9 - Start the React Frontend Dashboard (Optional)
+
+The React dashboard provides a modern web UI for uploading data and viewing predictions. Requires Node.js 18+.
+
+Open a **new PowerShell window**, then:
+
+```powershell
+cd USG_WarrantyClaimsAnalyzer\frontend
+
+# Install Node.js dependencies (first time only)
 npm install
 
-# Copy environment file
-copy .env.example .env
-
-# Start development server
+# Start the development server
 npm run dev
 ```
 
-The dashboard will open at: http://localhost:3000
+The frontend opens at: http://localhost:3000
 
-## Common Issues & Solutions
+> **Prerequisite**: The FastAPI backend (Step 7) must be running for the React dashboard to work.
 
-### Issue: "Module not found" error
+---
 
-**Solution**: Make sure virtual environment is activated
+## Quick Reference - Daily Usage
+
+Once the initial setup is complete, starting the application daily requires just:
 
 ```powershell
-venv\Scripts\activate
+# Terminal 1: Start the API
+cd USG_WarrantyClaimsAnalyzer
+.venv\Scripts\activate
+scripts\start_api.bat
+
+# Terminal 2 (optional): Start the React dashboard
+cd USG_WarrantyClaimsAnalyzer\frontend
+npm run dev
 ```
 
-Your prompt should show `(venv)` prefix.
+## Common Issues and Solutions
 
-### Issue: "Data file not found"
+### "Module not found" or import errors
 
-**Solution**: Verify file location
+The virtual environment is not activated. Activate it first:
 
 ```powershell
-# Check if file exists
+.venv\Scripts\activate
+```
+
+Your prompt must show the `(.venv)` prefix.
+
+### "Data file not found"
+
+Verify the file is in the expected location:
+
+```powershell
 dir data\raw\USG_Data_cleared.csv
-
-# Should show your file, not "File Not Found"
 ```
 
-### Issue: Training fails with "Cannot save file into a non-existent directory"
+### Training fails with "Cannot save file into a non-existent directory"
 
-**Solution**: The script creates directories automatically, but if needed:
+The training scripts create directories automatically, but if needed:
 
 ```powershell
 mkdir data\processed -Force
@@ -208,193 +277,122 @@ mkdir reports\visualizations -Force
 mkdir reports\metrics -Force
 ```
 
-### Issue: Import errors in notebooks
+### API doesn't start - port already in use
 
-**Solution**: Use the standalone scripts instead of notebooks. The notebooks are for reference only. Use:
-- `scripts\train.bat` instead of running notebooks manually
+Another process is using port 8000.
 
-### Issue: "numpy.ndarray size changed" warning
+**Option 1**: Find and stop the other process:
 
-**Solution**: This is just a warning, not an error. You can ignore it or reinstall numpy:
+```powershell
+netstat -ano | findstr :8000
+taskkill /PID <PID> /F
+```
+
+**Option 2**: Run on a different port:
+
+```powershell
+uvicorn src.api:app --host 0.0.0.0 --port 8080
+```
+
+### "numpy.ndarray size changed" warning
+
+This is a harmless warning, not an error. You can ignore it or reinstall numpy:
 
 ```powershell
 pip install --force-reinstall numpy
 ```
 
-### Issue: API doesn't start - port already in use
+### Virtual environment was created with `venv` instead of `.venv`
 
-**Solution**: Another process is using port 8000. Either:
+If you previously created the environment as `venv\`, you can either:
 
-**Option 1**: Kill the other process
+1. Continue using `venv\Scripts\activate` (it works the same), or
+2. Delete and recreate with the standard name:
+
 ```powershell
-# Find what's using port 8000
-netstat -ano | findstr :8000
-
-# Kill it (replace PID with actual number)
-taskkill /PID <PID> /F
-```
-
-**Option 2**: Use different port
-```powershell
-uvicorn src.api:app --host 0.0.0.0 --port 8080
+rmdir /s /q venv
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
 ## Verify Installation
 
-Run this quick test:
-
 ```powershell
-# 1. Check Python version
+# Check Python version (3.10+ required)
 python --version
-# Should show: Python 3.10.x or higher
 
-# 2. Check if packages are installed
+# Check key packages are installed
 pip list | findstr xgboost
 pip list | findstr shap
 pip list | findstr fastapi
 
-# 3. Test imports
+# Test imports
 python -c "import xgboost; import shap; import fastapi; print('All imports OK')"
+
+# Check model files exist (after training)
+dir models\model.pkl
+dir models\preprocessor.pkl
 ```
 
 ## Project Structure After Setup
 
 ```
-ALK_DuzyProjekt/
+USG_WarrantyClaimsAnalyzer/
+├── .venv/                              Virtual environment (required)
 ├── data/
 │   ├── raw/
-│   │   └── USG_Data_cleared.csv    ✅ Your data file
-│   └── processed/
-│       ├── X_processed.csv          ✅ After training
-│       └── y_target.csv             ✅ After training
+│   │   └── USG_Data_cleared.csv        Your data file
+│   └── processed/                      Generated after training
 ├── models/
-│   ├── model.pkl                    ✅ After training
-│   ├── preprocessor.pkl             ✅ After training
-│   ├── feature_names.json           ✅ After training
-│   └── shap_explainer.pkl           ✅ After SHAP analysis
+│   ├── model.pkl                       Generated after training
+│   ├── preprocessor.pkl                Generated after training
+│   ├── feature_names.json              Generated after training
+│   └── shap_explainer.pkl              Generated after SHAP analysis
 ├── reports/
-│   ├── visualizations/              ✅ After SHAP analysis
-│   │   ├── shap_summary_plot.png
-│   │   ├── shap_bar_plot.png
-│   │   └── ...
-│   └── metrics/                     ✅ After training
-│       ├── evaluation_results.json
-│       └── best_hyperparameters.json
+│   ├── visualizations/                 Generated after SHAP analysis
+│   └── metrics/                        Generated after training
 ├── scripts/
-│   ├── train.bat                    📜 Run training
-│   ├── shap.bat                     📜 Run SHAP analysis
-│   ├── start_api.bat                📜 Start API server
-│   ├── train_model.py               🐍 Training script
-│   └── run_shap_analysis.py         🐍 SHAP script
+│   ├── train.bat                       Full training (Optuna + ensemble)
+│   ├── train_simple.bat                Simple training (ml_core.py)
+│   ├── start_api.bat                   Start FastAPI server
+│   ├── dashboard.bat                   Start Streamlit dashboard
+│   ├── shap.bat                        Generate SHAP analysis
+│   └── verify.bat                      Verify setup
 ├── src/
-│   ├── preprocessing.py
-│   ├── model.py
-│   ├── evaluation.py
-│   └── api.py
-└── venv/                            📦 Virtual environment
-```
-
-## Usage Workflow
-
-**Complete workflow:**
-
-```powershell
-# 1. Activate environment (always first!)
-venv\Scripts\activate
-
-# 2. Train model (once, or when you get new data)
-scripts\train.bat
-
-# 3. Generate SHAP explanations (once, after training)
-scripts\shap.bat
-
-# 4. Start API server (keep running)
-scripts\start_api.bat
-
-# 5. (Optional) Start dashboard (in new terminal)
-cd frontend
-npm run dev
-```
-
-**Daily usage** (after initial setup):
-
-```powershell
-# Just start the API
-venv\Scripts\activate
-scripts\start_api.bat
+│   ├── api.py                          FastAPI server
+│   ├── preprocessing.py                Feature engineering
+│   ├── model.py                        Model training
+│   └── evaluation.py                   Metrics and validation
+├── frontend/                           React dashboard (optional)
+├── ml_core.py                          Unified training pipeline
+├── app.py                              Streamlit dashboard
+├── requirements.txt                    Python dependencies
+└── dashboard_requirements.txt          Streamlit dependencies
 ```
 
 ## Performance Expectations
 
 | Metric | Value |
 |--------|-------|
-| Training time | 5-10 minutes |
+| Simple training time | 2-3 minutes |
+| Full training time | 5-10 minutes |
 | SHAP analysis | 2-3 minutes |
-| API startup | <5 seconds |
-| Prediction latency | <100ms |
-| Model F1 score | 75-85% |
-| Model ROC-AUC | 85-92% |
+| API startup | < 5 seconds |
+| Prediction latency | < 100 ms |
+| Model F1 score | 0.78 - 0.85 |
+| Model ROC-AUC | 0.85 - 0.93 |
 
 ## Next Steps
 
-After successful setup:
+After setup is complete:
 
-1. **Review performance metrics**: Check `reports/metrics/evaluation_results.json`
-2. **Examine SHAP plots**: Open PNG files in `reports/visualizations/`
-3. **Test API**: Use interactive docs at http://localhost:8000/docs
-4. **Read documentation**: See `docs/MODEL_CARD.md` for model details
-5. **Business report**: See `docs/BUSINESS_REPORT.md` for ROI analysis
-
-## Getting Help
-
-**Before asking for help**, check:
-1. ✅ Virtual environment is activated (`(venv)` in prompt)
-2. ✅ All dependencies installed (`pip list` shows packages)
-3. ✅ Data file exists at `data\raw\USG_Data_cleared.csv`
-4. ✅ You're in the project root directory
-
-**Common commands for debugging:**
-
-```powershell
-# Check what's installed
-pip list
-
-# Check Python path
-python -c "import sys; print(sys.executable)"
-
-# Verify imports work
-python -c "import src.model; print('OK')"
-
-# Check file structure
-tree /F data
-tree /F models
-```
-
-**For issues or questions:**
-- GitHub Issues: https://github.com/BartekGl/ALK_DuzyProjekt/issues
-- Review error messages carefully - they usually point to the problem
-- Check logs in terminal output
-
-## Tips for Success
-
-1. **Always activate venv** before running any scripts
-2. **Use batch scripts** (`.bat` files) - they're tested and reliable
-3. **Don't modify notebooks** unless you know what you're doing - use scripts instead
-4. **Keep data file in place** - don't move `USG_Data_cleared.csv` after setup
-5. **Wait for training to complete** - don't interrupt the process
-6. **Check health endpoint** before making predictions
-
-## Troubleshooting Checklist
-
-- [ ] Python 3.10+ installed?
-- [ ] Virtual environment activated?
-- [ ] Requirements installed? (`pip list | findstr xgboost`)
-- [ ] Data file in correct location? (`dir data\raw\USG_Data_cleared.csv`)
-- [ ] Directories created? (`mkdir data\processed models reports -Force`)
-- [ ] Running from project root? (`pwd` should show ALK_DuzyProjekt)
+1. Explore the API docs at http://localhost:8000/docs
+2. Review model metrics in `reports\metrics\evaluation_results.json`
+3. Examine SHAP plots in `reports\visualizations\`
+4. Read `docs\DEPLOYMENT_GUIDE.md` for production deployment options
+5. See `DASHBOARD_GUIDE.md` for Streamlit dashboard usage
 
 ---
 
-**Last Updated**: January 2026
-**Platform**: Windows 10/11
-**Python**: 3.10+
+**Platform**: Windows 10/11 | **Python**: 3.10+ | **Last Updated**: February 2026
