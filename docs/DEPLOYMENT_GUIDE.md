@@ -31,7 +31,7 @@
 ```bash
 # Clone repository
 git clone https://github.com/BartekGl/USG_WarrantyClaimsAnalyzer.git
-cd ALK_DuzyProjekt
+cd USG_WarrantyClaimsAnalyzer
 
 # Create virtual environment
 python -m venv venv
@@ -45,8 +45,8 @@ pip install -r requirements.txt
 
 ```bash
 # Clone repository
-git clone https://github.com/https://github.com/BartekGl/USG_WarrantyClaimsAnalyzer.git
-cd ALK_DuzyProjekt
+git clone https://github.com/BartekGl/USG_WarrantyClaimsAnalyzer.git
+cd USG_WarrantyClaimsAnalyzer
 
 # Create conda environment
 conda env create -f environment.yml
@@ -435,7 +435,7 @@ python src/api.py
 ### Contact Support
 
 If issues persist:
-1. Check GitHub Issues: https://github.com/BartekGl/ALK_DuzyProjekt/issues
+1. Check GitHub Issues: https://github.com/BartekGl/USG_WarrantyClaimsAnalyzer/issues
 2. Review logs in `logs/` directory
 3. Contact development team with:
    - Error messages
@@ -515,4 +515,5 @@ echo "v1.0.0 - Trained on 2026-01-25" > models/VERSION.txt
 
 **Last Updated:** January 2026
 **Maintained By:** USG Analytics Team
+
 
