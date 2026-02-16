@@ -89,8 +89,8 @@ ALK_DuzyProjekt/
 
 ```bash
 # Clone repository
-git clone https://github.com/BartekGl/ALK_DuzyProjekt.git
-cd ALK_DuzyProjekt
+git clone https://github.com/BartekGl/USG_WarrantyClaimsAnalyzer.git
+cd USG_WarrantyClaimsAnalyzer
 
 # Create virtual environment
 python -m venv venv
@@ -422,7 +422,7 @@ This project is licensed under the MIT License - see LICENSE file for details.
 ## 📞 Contact
 
 For questions or support:
-- GitHub Issues: [Create an issue](https://github.com/BartekGl/ALK_DuzyProjekt/issues)
+- GitHub Issues: [Create an issue](https://github.com/BartekGl/USG_WarrantyClaimsAnalyzer/issues)
 - Email: [Insert contact email]
 
 ---
@@ -430,3 +430,4 @@ For questions or support:
 **Built with ❤️ for production-grade ML systems**
 
 Last Updated: January 2026
+
