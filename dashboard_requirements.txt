@@ -1,0 +1,7 @@
+# Additional requirements for Mission Control Dashboard
+# Install with: pip install -r dashboard_requirements.txt
+
+streamlit>=1.31.0
+streamlit-shap>=1.0.2
+plotly>=5.18.0
+kaleido>=0.2.1
