@@ -30,7 +30,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/BartekGl/ALK_DuzyProjekt.git
+git clone https://github.com/BartekGl/USG_WarrantyClaimsAnalyzer.git
 cd ALK_DuzyProjekt
 
 # Create virtual environment
@@ -45,7 +45,7 @@ pip install -r requirements.txt
 
 ```bash
 # Clone repository
-git clone https://github.com/BartekGl/ALK_DuzyProjekt.git
+git clone https://github.com/https://github.com/BartekGl/USG_WarrantyClaimsAnalyzer.git
 cd ALK_DuzyProjekt
 
 # Create conda environment
@@ -515,3 +515,4 @@ echo "v1.0.0 - Trained on 2026-01-25" > models/VERSION.txt
 
 **Last Updated:** January 2026
 **Maintained By:** USG Analytics Team
+
