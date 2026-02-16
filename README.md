@@ -4,193 +4,289 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Production-grade machine learning system for predicting warranty claim failures in ultrasound (USG) device manufacturing. Achieves **75-85% F1 score** with full SHAP interpretability, enabling **60-80% reduction in warranty costs**.
+# VET-GUARD — AI-Powered Warranty Claims Analyzer for USG Devices
 
-## 🎯 Key Features
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
+[![XGBoost](https://img.shields.io/badge/XGBoost-2.0+-orange.svg)](https://xgboost.readthedocs.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-### Machine Learning
-- **High Performance:** 85-92% ROC-AUC, 75-85% F1 score
-- **Full Interpretability:** SHAP explanations for every prediction
-- **Production-Ready:** <100ms inference latency, FastAPI deployment
-- **Ensemble Methods:** XGBoost + Random Forest + LightGBM
-- **Advanced Techniques:** SMOTE, Optuna hyperparameter tuning, Platt calibration
-- **Business Impact:** $155K+ annual cost savings
+> **Academic project** — Final project for the *AI in Business* postgraduate program, Group B.  
+> VET-GUARD is a production-grade machine learning system for predicting warranty claim failures in ultrasound (USG) medical device manufacturing. It achieves **75–85% F1 score** with full SHAP interpretability, enabling an estimated **60–85% reduction in warranty costs**.
 
-### Modern Dashboard (NEW!)
-- **Lovable.dev Style:** Stunning animations with Framer Motion
-- **Real-time Visualization:** Live prediction stream and risk heatmap
-- **Interactive Analytics:** 3-panel layout with production metrics
-- **60 FPS Performance:** Optimized React 18 + TypeScript + Tailwind CSS
-- **Drag & Drop Upload:** Easy CSV data ingestion
-- **Responsive Design:** Mobile-first approach
+---
 
-## 📊 Business Problem
+## 📌 Project Overview
 
-**Challenge:** 9.52% warranty claim rate (220+ failures out of 2,310 devices) costing **$220,000 annually**.
+**Business Problem: VET-EYE S.A., a veterinary ultrasound manufacturer selling 676 units annually, faces a 10% warranty failure rate — 89% of claims tied to LCD screen failures — generating $143,616 in yearly quality costs and eroding competitiveness against global leaders (GE, Esaote) and aggressive Chinese entrants (Mindray) in a $543M market.
+**Solution: VET-GUARD is an on-premise AI system using XGBoost and BalancedRandomForest on 2,027 production records (42 variables) that identified two root causes — cable supplier Cables-X (22.9% failure rate) and soldering time >4.7s — enabling a shift from reactive to predictive quality control. With a $41K investment and $15K/year maintenance, the project delivers payback in under 2 years (IRR 42–137%), while building a proprietary "Data Moat" of process-defect knowledge that competitors cannot replicate.
 
-**Solution:** ML-powered early detection system that identifies high-risk devices before shipment, enabling proactive quality interventions.
+**Key results:**
+- ✅ ~75% reduction in warranty costs ($155K+ annual savings)
+- ✅ <100 ms real-time inference latency
+- ✅ Full transparency via SHAP explanations (explainability-by-design)
+- ✅ ROI approx. 153% in the first year
 
-**Results:**
-- ✅ 75% reduction in warranty costs ($155K+ annual savings)
-- ✅ <100ms real-time predictions
-- ✅ Full transparency with SHAP explanations
-- ✅ ROI >500% in first year
+---
 
-## 🏗️ Project Structure
+## 🏗️ Architecture & Project Structure
 
 ```
-ALK_DuzyProjekt/
-├── frontend/                   # 🎨 Modern React Dashboard (NEW!)
+USG_WarrantyClaimsAnalyzer/
+├── frontend/                        # React 18 + TypeScript dashboard (Vite)
 │   ├── src/
-│   │   ├── components/        # Dashboard components
-│   │   ├── pages/             # Landing, Upload, Dashboard
-│   │   ├── stores/            # Zustand state management
-│   │   ├── utils/             # API client, animations
-│   │   └── types/             # TypeScript definitions
-│   ├── Dockerfile             # Frontend container
-│   ├── nginx.conf             # Production server config
-│   └── package.json           # Dependencies
-├── data/
-│   ├── raw/                   # Original dataset (USG_Data_cleared.csv)
-│   └── processed/             # Engineered features
-├── notebooks/
-│   ├── 01_EDA.ipynb           # Exploratory Data Analysis
+│   │   ├── components/dashboard/    # Charts, heatmaps, prediction stream
+│   │   ├── pages/                   # Landing, Upload, Dashboard pages
+│   │   ├── stores/                  # Zustand state management
+│   │   ├── utils/                   # API client, animations
+│   │   └── types/                   # TypeScript type definitions
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   └── package.json
+│
+├── src/                             # Python ML backend
+│   ├── api.py                       # FastAPI inference service
+│   ├── preprocessing.py             # Feature engineering pipeline
+│   ├── model.py                     # XGBoost ensemble + Optuna tuning
+│   └── evaluation.py               # Metrics, cross-validation, reports
+│
+├── notebooks/                       # Step-by-step analysis (Jupyter)
+│   ├── 01_EDA.ipynb                 # Exploratory Data Analysis
 │   ├── 02_Feature_Engineering.ipynb
 │   ├── 03_Model_Training.ipynb
-│   └── 04_SHAP_Analysis.ipynb # Interpretability analysis
-├── src/                        # Backend ML system
-│   ├── preprocessing.py        # Feature engineering pipeline
-│   ├── model.py               # XGBoost ensemble with Optuna
-│   ├── evaluation.py          # Comprehensive metrics & validation
-│   └── api.py                 # FastAPI inference service
-├── models/                     # Saved model artifacts
-│   ├── model.pkl              # Trained ensemble model
-│   ├── preprocessor.pkl       # Feature engineering pipeline
-│   ├── shap_explainer.pkl     # SHAP explainer
-│   └── feature_names.json     # Feature metadata
-├── reports/
-│   ├── visualizations/        # SHAP plots, EDA charts
-│   └── metrics/               # Evaluation results (JSON)
+│   └── 04_SHAP_Analysis.ipynb
+│
+├── data/
+│   ├── raw/                         # Source data (USG_Data_cleared.csv)
+│   └── synthetic/                   # Synthetic training data
+│
+├── models/                          # Saved model artifacts
+│   ├── model.pkl
+│   ├── preprocessor.pkl
+│   ├── production_model.pkl
+│   ├── production_preprocessor.pkl
+│   └── feature_names.json
+│
+├── scripts/                         # Convenience batch scripts (Windows)
+│   ├── train.bat                    # Full training (Optuna + ensemble)
+│   ├── train_simple.bat             # Simple quick training
+│   ├── start_api.bat                # Start FastAPI server
+│   ├── dashboard.bat                # Start Streamlit dashboard
+│   ├── shap.bat                     # Run SHAP analysis
+│   └── verify.bat                   # Verify installation
+│
 ├── docs/
-│   ├── MODEL_CARD.md          # Model documentation
-│   ├── DEPLOYMENT_GUIDE.md    # Deployment instructions
-│   └── BUSINESS_REPORT.md     # Business impact analysis
-├── tests/                      # Unit tests
-├── docker-compose.full.yml     # Full stack deployment (frontend + backend)
-├── requirements.txt
-├── environment.yml
-├── Dockerfile
-└── README.md
+│   └── DEPLOYMENT_GUIDE.md
+│
+├── ml_core.py                       # Unified single-file training pipeline
+├── app.py                           # Streamlit analytics dashboard
+├── analytics_engine.py
+├── business_analytics.py
+├── executive_dashboard.py
+├── production_inference.py
+├── generate_training_data.py
+├── train_production_model.py
+│
+├── requirements.txt                 # Python dependencies
+├── dashboard_requirements.txt       # Streamlit extras
+├── environment.yml                  # Conda environment
+├── Dockerfile                       # Backend container
+├── docker-compose.yml               # Backend only
+└── docker-compose.full.yml          # Full stack (frontend + backend)
 ```
+
+---
 
 ## 🚀 Quick Start
 
-### Installation
+### Prerequisites
+
+| Requirement | Minimum | Notes |
+|---|---|---|
+| Python | 3.10+ | [python.org](https://www.python.org/downloads/) |
+| RAM | 4 GB | 8 GB recommended for Optuna tuning |
+| Node.js | 18+ | Only for the React frontend |
+| Docker | 20.10+ | Only for containerised deployment |
+
+---
+
+### Option A — Local (Python only, recommended for development)
 
 ```bash
-# Clone repository
+# 1. Clone the repository
 git clone https://github.com/BartekGl/USG_WarrantyClaimsAnalyzer.git
 cd USG_WarrantyClaimsAnalyzer
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# 2. Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate          # Linux / macOS
+.venv\Scripts\activate             # Windows PowerShell
 
-# Install dependencies
+# 3. Install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
+
+# 4. Verify installation
+python -c "import xgboost; import shap; import fastapi; print('All imports OK')"
+# or use the helper script (Windows):
+scripts\verify.bat
 ```
 
-### Data Preparation
+---
 
-Place your dataset in the `data/raw/` directory:
+### Option B — Docker (recommended for production / demo)
+
+**Full stack (API + React dashboard):**
+```bash
+docker-compose -f docker-compose.full.yml up -d
+
+# Services:
+# React Dashboard   → http://localhost:3000
+# FastAPI backend   → http://localhost:8000
+# Swagger UI        → http://localhost:8000/docs
+```
+
+**Backend only:**
+```bash
+docker-compose up -d
+# or
+docker build -t usg-vetguard .
+docker run -d -p 8000:8000 --name usg-api usg-vetguard
+```
+
+---
+
+## 📊 Data Preparation
+
+Place the source CSV in `data/raw/`:
 
 ```bash
+# Linux / macOS
 cp /path/to/USG_Data_cleared.csv data/raw/
+
+# Windows
+copy "C:\path\to\USG_Data_cleared.csv" data\raw\
 ```
 
-### Training
+**Required columns in the CSV:**
 
-Run Jupyter notebooks in sequence:
+| Column | Description |
+|---|---|
+| `Warranty_Claim` | Target variable (Yes / No) |
+| `Assembly_Temp_C` | Assembly environment temperature |
+| `Humidity_Percent` | Relative humidity during assembly |
+| `Solder_Temp_C` | Soldering iron temperature |
+| `Solder_Time_s` | Soldering contact duration |
+| `Torque_Nm` | Torque applied during assembly |
+| `Gap_mm` | Component gap measurement |
+| `Batch_ID` | Production batch identifier |
+| `Region` | Destination region (EU, US, APAC, …) |
+
+The dataset also includes supplier codes (including the flagged **Cable-X** LCD supplier) and additional production parameters — 44 columns total before feature engineering.
+
+---
+
+## 🧠 Model Training
+
+### Simple training (fast, ~2–3 min)
+
+Uses the unified `ml_core.py` pipeline with optimised defaults:
 
 ```bash
-jupyter notebook
-
-# Execute in order:
-# 1. notebooks/01_EDA.ipynb              - Exploratory analysis
-# 2. notebooks/02_Feature_Engineering.ipynb - Feature creation
-# 3. notebooks/03_Model_Training.ipynb   - Model training & optimization
-# 4. notebooks/04_SHAP_Analysis.ipynb    - Interpretability
+python ml_core.py
+# Windows: scripts\train_simple.bat
 ```
 
-Or use the training script:
+Produces:
+- `models/model.pkl` — trained XGBoost model
+- `models/preprocessor.pkl` — feature pipeline
+- `models/feature_names.json`
+
+### Full training with Optuna (5–10 min)
+
+Trains an ensemble (XGBoost + Random Forest + LightGBM) with automatic hyperparameter search:
 
 ```bash
 python scripts/train_model.py
+# Windows: scripts\train.bat
 ```
 
-### Deployment
+Additional outputs:
+- `data/processed/` — engineered feature matrices
+- `reports/metrics/evaluation_results.json`
+- `reports/metrics/best_hyperparameters.json`
+
+### Jupyter notebooks (step-by-step exploration)
 
 ```bash
-# Start FastAPI server
-cd src
-python api.py
-
-# Or with uvicorn
-uvicorn src.api:app --host 0.0.0.0 --port 8000 --workers 4
+jupyter notebook
+# Run in order: 01 → 02 → 03 → 04
 ```
 
-Access API documentation at `http://localhost:8000/docs`
+---
 
-### Full Stack Deployment (Frontend + Backend)
+## 🔍 SHAP Explainability
+
+Generate feature importance visualisations:
 
 ```bash
-# Deploy entire system with Docker Compose
-docker-compose -f docker-compose.full.yml up -d
-
-# Access services:
-# - Frontend Dashboard: http://localhost:3000
-# - Backend API: http://localhost:8000
-# - API Docs: http://localhost:8000/docs
-
-# View logs
-docker-compose -f docker-compose.full.yml logs -f
-
-# Stop all services
-docker-compose -f docker-compose.full.yml down
+python scripts/run_shap_analysis.py
+# Windows: scripts\shap.bat
 ```
 
-### Backend Only
+Output (saved to `reports/visualizations/`):
+- `shap_summary_plot.png` — global beeswarm summary
+- `shap_bar_plot.png` — ranked feature importance
+- `shap_waterfall_failure.png` — example failure explanation
+- `shap_waterfall_no_failure.png` — example non-failure explanation
+- `models/shap_explainer.pkl` — saved explainer for API use
+
+---
+
+## 📡 Starting the API
 
 ```bash
-# Build and run backend only
-docker build -t usg-failure-prediction .
-docker run -d -p 8000:8000 --name usg-api usg-failure-prediction
+# Using uvicorn directly
+uvicorn src.api:app --host 0.0.0.0 --port 8000 --reload
 
-# Or use Docker Compose (backend only)
-docker-compose up -d
+# Windows batch shortcut
+scripts\start_api.bat
 ```
 
-### Frontend Only
+Health check: `http://localhost:8000/health`
+Interactive docs (Swagger): `http://localhost:8000/docs`
+
+---
+
+## 📊 Dashboards
+
+### Streamlit (analytics / internal use)
 
 ```bash
-# Navigate to frontend directory
+# Install additional dependencies (first time only)
+pip install -r dashboard_requirements.txt
+
+streamlit run app.py
+# Windows: scripts\dashboard.bat
+# Opens at: http://localhost:8501
+```
+
+### React frontend (modern web UI)
+
+Requires Node.js 18+ and a running FastAPI backend.
+
+```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Start development server
 npm run dev
-
-# Or build for production
-npm run build
-docker build -t usg-dashboard .
-docker run -d -p 3000:80 usg-dashboard
+# Development server at: http://localhost:3000
 ```
 
-## 📡 API Usage
+---
 
-### Single Prediction with SHAP Explanation
+## 📡 API Reference
+
+### Single prediction with SHAP explanation
 
 ```bash
 curl -X POST "http://localhost:8000/predict" \
@@ -220,14 +316,13 @@ Response:
   "threshold": 0.5,
   "shap_values": {
     "Supplier_A_Failure_Rate": -0.15,
-    "Batch_Failure_Rate": -0.12,
-    ...
+    "Batch_Failure_Rate": -0.12
   },
-  "timestamp": "2026-01-25T10:30:45"
+  "timestamp": "2026-02-16T10:30:45"
 }
 ```
 
-### Batch Prediction
+### Batch prediction (Python)
 
 ```python
 import requests
@@ -243,113 +338,70 @@ response = requests.post(
         "threshold": 0.5
     }
 )
-
 results = response.json()
 print(f"Predicted failures: {results['predicted_failures']}/{results['total_devices']}")
 ```
 
-## 🧪 Technical Details
+---
 
-### Model Architecture
+## 🤖 ML Details
 
-**Ensemble Components:**
-1. **XGBoost:** Primary classifier with Optuna-optimized hyperparameters
-2. **Random Forest:** 300 trees, max_depth=10, class_weight='balanced'
-3. **LightGBM:** 300 estimators, learning_rate=0.05, num_leaves=31
+### Model architecture
 
-**Voting Strategy:** Soft voting with weights [2, 1, 1] (XGBoost prioritized)
+VET-GUARD uses a **soft-voting ensemble** of three classifiers:
 
-**Optimization:**
-- Optuna with 50+ trials
-- Tree-structured Parzen Estimator (TPE) sampler
-- 5-fold stratified cross-validation
-- F1 score as primary metric
+| Model | Role | Weight |
+|---|---|---|
+| XGBoost | Primary classifier (Optuna-tuned) | 2 |
+| Random Forest | 300 trees, balanced class weights | 1 |
+| LightGBM | 300 estimators, lr=0.05 | 1 |
 
-**Class Imbalance Handling:**
-- SMOTE (Synthetic Minority Over-sampling)
-- Class weights (scale_pos_weight dynamically calculated)
-- Threshold optimization via precision-recall curves
+Post-training calibration is applied via **Platt scaling** (5-fold cross-validation) to produce reliable probability estimates.
 
-**Calibration:**
-- Platt scaling (sigmoid calibration)
-- 5-fold cross-validation for calibration
+### Feature engineering
 
-### Feature Engineering
+Starting from **44 raw columns**, the pipeline engineers **60+ features** including:
 
-**Original Features:** 44 columns
-**Engineered Features:** 60+ total
+- **Batch aggregates** — batch age, failure rate, batch size
+- **Interaction terms** — `Assembly_Temp × Humidity`, `Solder_Temp × Solder_Time`, `Torque × Gap`
+- **Supplier encoding** — failure rate per supplier (flags Cable-X systematically)
+- **Anomaly scores** — Isolation Forest scores on environmental parameters
+- **Time-series patterns** — chronological trends from serial numbers
 
-**Key Transformations:**
-- **Batch Features:** Age, failure rate, size
-- **Interactions:** Temperature × Humidity, Torque × Gap, Solder_Temp × Solder_Time
-- **Supplier Encoding:** Failure rate aggregates per supplier
-- **Anomaly Detection:** Isolation Forest scores on environmental parameters
-- **Time-Series:** Serial number chronological patterns
+### Class imbalance handling
 
-### Performance Metrics
+- **SMOTE** — synthetic oversampling of the minority class
+- **Dynamic class weights** — `scale_pos_weight` calculated per dataset
+- **Threshold optimisation** — via precision-recall curve analysis
 
-| Metric | Score | Interpretation |
-|--------|-------|----------------|
-| **F1 Score** | 0.75-0.85 | Balanced precision/recall |
-| **Precision** | 0.70-0.80 | 70-80% predicted failures are correct |
-| **Recall** | 0.75-0.85 | 75-85% actual failures detected |
-| **ROC-AUC** | 0.85-0.92 | Excellent discrimination |
-| **PR-AUC** | 0.70-0.80 | Strong on imbalanced data |
-| **Business Cost** | 75% reduction | $155K+ annual savings |
+### Performance
 
-### Interpretability (SHAP)
+| Metric | Score |
+|---|---|
+| F1 Score | 0.75 – 0.85 |
+| Precision | 0.70 – 0.80 |
+| Recall | 0.75 – 0.85 |
+| ROC-AUC | 0.85 – 0.92 |
+| PR-AUC | 0.70 – 0.80 |
+| Inference latency | < 100 ms |
 
-- **Global Importance:** Summary plots identify top 20 features
-- **Local Explanations:** Waterfall plots for each prediction
-- **Feature Interactions:** Dependence plots reveal non-linear relationships
-- **Business Insights:** Actionable recommendations from SHAP analysis
+---
 
 ## 📈 Key Findings
 
-### Top 5 Failure Predictors
+SHAP analysis identified the top failure predictors:
 
-1. **Supplier Failure Rate Encodings** - Certain suppliers have 15-30% failure rates
-2. **Batch Quality Indicators** - Batch failure rate and size highly predictive
-3. **Environmental Parameters** - Temperature × Humidity interactions critical
-4. **Solder Process Parameters** - Solder temp × time combinations matter
-5. **Anomaly Scores** - Devices with unusual parameter combinations at high risk
+1. **Supplier failure rate encoding** — Cable-X (LCD supplier) shows 15–30% failure rates; flagged as primary root cause
+2. **Batch quality indicators** — batch-level failure rate and size are highly predictive
+3. **Environmental conditions** — Temperature × Humidity interactions, especially outside 20–23°C / 40–50% RH
+4. **Solder process parameters** — specific temperature × time combinations correlate strongly with defects
+5. **Anomaly scores** — devices with unusual parameter combinations are at significantly elevated risk
 
-### Actionable Recommendations
+---
 
-1. **Supplier Quality:**
-   - Audit high-risk suppliers (3+ with >20% failure rate)
-   - Implement supplier qualification programs
-   - Diversify critical component sourcing
+## ⚙️ Configuration
 
-2. **Process Controls:**
-   - Tighten environmental tolerances (Temp: 20-23°C, Humidity: 40-50%)
-   - Optimize solder parameter windows
-   - Install real-time monitoring sensors
-
-3. **Batch Management:**
-   - Enhance batch-level quality controls
-   - Implement real-time batch anomaly detection
-   - Track batch genealogy for traceability
-
-## 📚 Documentation
-
-- **[Model Card](docs/MODEL_CARD.md):** Architecture, performance, limitations
-- **[Deployment Guide](docs/DEPLOYMENT_GUIDE.md):** Installation, configuration, troubleshooting
-- **[Business Report](docs/BUSINESS_REPORT.md):** Impact analysis, ROI, recommendations
-
-## 🧪 Testing
-
-```bash
-# Run unit tests
-pytest tests/ -v
-
-# Run with coverage
-pytest tests/ --cov=src --cov-report=html
-```
-
-## 🔧 Configuration
-
-Create `.env` file:
+Create a `.env` file in the project root:
 
 ```bash
 API_HOST=0.0.0.0
@@ -360,57 +412,92 @@ PREPROCESSOR_PATH=models/preprocessor.pkl
 LOG_LEVEL=INFO
 ```
 
-## 📊 Monitoring
+---
 
-Key metrics to track in production:
+## 🔧 Troubleshooting
 
-- **Latency:** Target <100ms per prediction
-- **Throughput:** Monitor requests/second
-- **Model Drift:** Weekly prediction distribution analysis
-- **Business Metrics:** Warranty cost trend, field failure rate
+**"Module not found" / import errors**
+The virtual environment is not activated. Run `.venv\Scripts\activate` (Windows) or `source .venv/bin/activate` (Linux/macOS). Your prompt must show the `(.venv)` prefix.
+
+**Port 8000 already in use**
+```bash
+# Find and kill the process (Windows)
+netstat -ano | findstr :8000
+taskkill /PID <PID> /F
+
+# Or run on a different port
+uvicorn src.api:app --host 0.0.0.0 --port 8080
+```
+
+**Training fails — missing directory**
+```bash
+mkdir -p data/processed models reports/visualizations reports/metrics
+# Windows: mkdir data\processed, models, reports\visualizations, reports\metrics -Force
+```
+
+**`numpy.ndarray size changed` warning**
+Harmless. Ignore or reinstall: `pip install --force-reinstall numpy`
+
+See [QUICK_START_WINDOWS.md](QUICK_START_WINDOWS.md) for full Windows-specific troubleshooting.
+
+---
 
 ## 🛠️ Technology Stack
 
-**Core ML:**
-- XGBoost 2.0+
-- scikit-learn 1.3+
-- LightGBM 4.0+
-- Optuna 3.4+ (hyperparameter tuning)
+**ML & Data**
+- XGBoost 2.0+, LightGBM 4.0+, scikit-learn 1.3+
+- SHAP 0.44+, Optuna 3.4+, imbalanced-learn 0.11+
+- Pandas, NumPy, Plotly, Matplotlib, Seaborn
 
-**Interpretability:**
-- SHAP 0.44+
-- PDPbox 0.3+
+**API & Backend**
+- FastAPI 0.104+, Uvicorn 0.24+, Pydantic 2.4+
 
-**Imbalanced Learning:**
-- imbalanced-learn 0.11+
+**Frontend**
+- React 18, TypeScript, Vite, Tailwind CSS, Framer Motion, Zustand
 
-**API & Deployment:**
-- FastAPI 0.104+
-- Uvicorn 0.24+
-- Pydantic 2.4+
+**Dashboards**
+- Streamlit (analytics view), React + nginx (production UI)
 
-**Visualization:**
-- Matplotlib 3.7+
-- Seaborn 0.12+
-- Plotly 5.17+
+**Infrastructure**
+- Docker, Docker Compose, Conda / pip virtual environments
 
-## 🤝 Contributing
+---
 
-Contributions welcome! Please:
+## 📚 Additional Documentation
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/improvement`)
-3. Commit changes (`git commit -am 'Add new feature'`)
-4. Push to branch (`git push origin feature/improvement`)
-5. Create Pull Request
+- [QUICK_START_WINDOWS.md](QUICK_START_WINDOWS.md) — Step-by-step Windows setup guide
+- [SIMPLE_TRAINING_GUIDE.md](SIMPLE_TRAINING_GUIDE.md) — Comparison of training approaches
+- [DASHBOARD_GUIDE.md](DASHBOARD_GUIDE.md) — Streamlit dashboard usage
+- [frontend/README.md](frontend/README.md) — React dashboard setup
+- [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) — Production deployment
+
+---
+
+## 🔬 Regulatory Context
+
+VET-GUARD was designed with awareness of the following regulatory frameworks (analysed as part of the academic project):
+
+- **EU AI Act** — classified as high-risk AI system (Annex III, medical devices)
+- **MDR 2017/745** — EU Medical Device Regulation
+- **GDPR** — data minimisation, purpose limitation, processing records
+- **ISO 13485** — quality management for medical devices
+
+Full compliance analysis is available in the accompanying academic thesis document.
+
+---
 
 ## 📝 License
 
-This project is licensed under the MIT License - see LICENSE file for details.
+MIT License — see [LICENSE](LICENSE) for details.
+
+---
 
 ## 👥 Authors
 
-**USG Analytics Team**
+**Group B** — *AI in Business* postgraduate program  
+Project: *Digital Transformation of Quality Control using AI for Medical Device Manufacturers*
+
+---
 
 ## 🙏 Acknowledgments
 
@@ -419,15 +506,10 @@ This project is licensed under the MIT License - see LICENSE file for details.
 - SMOTE: Chawla et al. (2002)
 - Optuna: Akiba et al. (2019)
 
-## 📞 Contact
-
-For questions or support:
-- GitHub Issues: [Create an issue](https://github.com/BartekGl/USG_WarrantyClaimsAnalyzer/issues)
-- Email: [Insert contact email]
-
 ---
 
-**Built with ❤️ for production-grade ML systems**
+**Last updated:** February 2026
 
 Last Updated: January 2026
+
 
